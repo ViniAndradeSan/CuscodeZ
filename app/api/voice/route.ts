@@ -111,6 +111,7 @@ export async function POST(req: NextRequest) {
   }
 
   const apiKey = process.env.GROQ_API_KEY;
+  const apiUrl = process.env.GROQ_API_URL ?? "https://api.groq.com/openai/v1/chat/completions";
   if (!apiKey) {
     return NextResponse.json({ error: "Serviço indisponível" }, { status: 500 });
   }
@@ -123,7 +124,7 @@ export async function POST(req: NextRequest) {
     .replace("{selectedEventName}", context.selectedEventName || "nenhum")
     .replace("{availableEvents}", (context.availableEvents || []).join(", ") || "desconhecidos");
 
-  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  const response = await fetch(apiUrl, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,

@@ -46,7 +46,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${_geist.variable} ${_geistMono.variable} ${_lora.variable} bg-background`}>
-      <body className="font-sans antialiased min-h-dvh bg-[#1A0A04]">
+      <body className="font-sans antialiased min-h-dvh">
         {/* Fundo escuro fora do app — só visível em desktop */}
         <div className="min-h-dvh flex items-start justify-center">
           {/* Container do app — max 430px, simula celular */}
