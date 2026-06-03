@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Debug</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #111; color: #eee; }
+    button { padding: 10px 20px; margin: 8px; font-size: 16px; cursor: pointer; border-radius: 8px; border: none; }
+    #startBtn { background: #1F5C8F; color: white; }
+    #speakBtn { background: #1D9E75; color: white; }
+    .ok { color: #4ade80; }
+    .err { color: #f87171; }
+    .warn { color: #fbbf24; }
+    pre { background: #222; padding: 12px; border-radius: 8px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>🎙️ Voice Debug Tool</h2>
+  <pre id="log">Iniciando diagnóstico...</pre>
+  <button id="startBtn" onclick="startRec()">🎤 Testar Microfone</button>
+  <button id="speakBtn" onclick="testSpeak()">🔊 Testar Fala (TTS)</button>
+
+  <script>
+    const log = document.getElementById('log');
+    function addLog(msg, type = '') {
+      const span = document.createElement('span');
+      span.className = type;
+      span.textContent = msg + '\n';
+      log.appendChild(span);
+    }
+
+    // --- Diagnóstico automático ---
+    addLog('=== Diagnóstico de Voz ===');
+    addLog(`isSecureContext: ${window.isSecureContext}`, window.isSecureContext ? 'ok' : 'err');
+    addLog(`Protocolo: ${location.protocol}`, location.protocol === 'https:' || location.hostname === 'localhost' ? 'ok' : 'warn');
+    addLog(`Host: ${location.hostname}`);
+
+    const hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+    addLog(`SpeechRecognition: ${hasSR ? 'OK' : 'NÃO SUPORTADO'}`, hasSR ? 'ok' : 'err');
+    addLog(`SpeechSynthesis: ${'speechSynthesis' in window ? 'OK' : 'NÃO SUPORTADO'}`, 'speechSynthesis' in window ? 'ok' : 'err');
+
+    if ('speechSynthesis' in window) {
+      function listVoices() {
+        const voices = speechSynthesis.getVoices();
+        addLog(`Vozes disponíveis: ${voices.length}`);
+        voices.filter(v => /pt/i.test(v.lang)).forEach(v => {
+          addLog(`  ✓ ${v.name} (${v.lang})`, 'ok');
+        });
+        if (!voices.some(v => /pt/i.test(v.lang))) addLog('  Nenhuma voz pt-BR encontrada', 'warn');
+      }
+      listVoices();
+      speechSynthesis.onvoiceschanged = listVoices;
+    }
+
+    // --- Teste de Microfone ---
+    function startRec() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) { addLog('SpeechRecognition não suportado neste browser.', 'err'); return; }
+      if (!window.isSecureContext) { addLog('ERRO: Precisa de HTTPS ou localhost!', 'err'); return; }
+
+      const rec = new SR();
+      rec.lang = 'pt-BR';
+      rec.interimResults = true;
+      rec.maxAlternatives = 1;
+
+      addLog('\n[MIC] Iniciando...', 'ok');
+
+      rec.onstart = () => addLog('[MIC] Ouvindo!', 'ok');
+      rec.onresult = (e) => {
+        const t = e.results[e.results.length - 1][0].transcript;
+        addLog(`[MIC] Ouviu: "${t}"`, 'ok');
+      };
+      rec.onerror = (e) => addLog(`[MIC] Erro: ${e.error}`, 'err');
+      rec.onend = () => addLog('[MIC] Encerrado');
+      rec.start();
+    }
+
+    // --- Teste de TTS ---
+    function testSpeak() {
+      if (!('speechSynthesis' in window)) { addLog('TTS não suportado.', 'err'); return; }
+      speechSynthesis.cancel();
+      speechSynthesis.pause();
+      speechSynthesis.resume();
+
+      const voices = speechSynthesis.getVoices();
+      const ptVoice = voices.find(v => /pt[-_]?BR/i.test(v.lang)) || voices.find(v => /^pt/i.test(v.lang));
+
+      const u = new SpeechSynthesisUtterance('Olá! O assistente de voz está funcionando corretamente.');
+      u.lang = 'pt-BR';
+      u.rate = 0.9;
+      if (ptVoice) { u.voice = ptVoice; addLog(`[TTS] Usando voz: ${ptVoice.name}`, 'ok'); }
+      else addLog('[TTS] Nenhuma voz pt-BR, usando padrão do sistema', 'warn');
+
+      u.onstart = () => addLog('[TTS] Falando...', 'ok');
+      u.onend = () => addLog('[TTS] Concluído!', 'ok');
+      u.onerror = (e) => addLog(`[TTS] Erro: ${e.error}`, 'err');
+      speechSynthesis.speak(u);
+    }
+  </script>
+</body>
+</html>

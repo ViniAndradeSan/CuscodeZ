@@ -1,0 +1,304 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #FAF7F2;
+  --foreground: #1A0A04;
+  --card: #FFFFFF;
+  --card-foreground: #1A0A04;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A0A04;
+  --primary: #D85A30;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F5F0E8;
+  --secondary-foreground: #1A0A04;
+  --muted: #EDE8E0;
+  --muted-foreground: #6B5B4F;
+  --accent: #D85A30;
+  --accent-foreground: #FFFFFF;
+  --destructive: #E74C3C;
+  --destructive-foreground: #FFFFFF;
+  --border: #E8E0D5;
+  --input: #E8E0D5;
+  --ring: #D85A30;
+  --radius: 0.875rem;
+
+  /* Tema São João */
+  --junina-orange: #D85A30;
+  --junina-purple: #5B2C6F;
+  --junina-pink: #A569BD;
+  --junina-yellow: #F5D547;
+  --junina-green: #27AE60;
+  --junina-red: #E74C3C;
+
+  /* Tons funcionais */
+  --calm: #1D9E75;
+  --calm-soft: #E1F5EE;
+  --calm-deep: #0F6E56;
+  --calm-darker: #0D5C48;
+
+  --warn: #EF9F27;
+  --warn-soft: #FAEEDA;
+  --warn-deep: #8A5A10;
+
+  --alert: #E74C3C;
+  --alert-soft: #FCEAE8;
+  --alert-deep: #8B1A10;
+
+  /* Font */
+  --font-serif: 'Lora', Georgia, serif;
+}
+
+.dark {
+  --background: #1A0A04;
+  --foreground: #FAF7F2;
+  --card: #2A1A10;
+  --card-foreground: #FAF7F2;
+  --popover: #2A1A10;
+  --popover-foreground: #FAF7F2;
+  --primary: #E87A50;
+  --primary-foreground: #1A0A04;
+  --secondary: #3A2A20;
+  --secondary-foreground: #FAF7F2;
+  --muted: #3A2A20;
+  --muted-foreground: #A99080;
+  --accent: #E87A50;
+  --accent-foreground: #1A0A04;
+  --destructive: #E74C3C;
+  --destructive-foreground: #FFFFFF;
+  --border: #4A3A30;
+  --input: #4A3A30;
+  --ring: #E87A50;
+}
+
+@theme inline {
+  --font-sans: 'Geist', 'Geist Fallback', sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
+  --font-serif: 'Lora', Georgia, serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Animações customizadas */
+@keyframes sanfona-bounce {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.7); }
+}
+
+.sanfona-bar {
+  animation: sanfona-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.5); }
+  70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+}
+
+.pulse-ring {
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Hero backgrounds */
+.hero-bg {
+  background: linear-gradient(135deg, #FBF0E5 0%, #F8E8D8 100%);
+}
+
+.hero-title {
+  font-weight: 500;
+  color: #1A0A04;
+}
+
+.badge-chip {
+  background: rgba(26, 10, 4, 0.06);
+  color: #6B5B4F;
+}
+
+/* Texturas */
+.xadrez-texture {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 8px,
+    rgba(216, 90, 48, 0.03) 8px,
+    rgba(216, 90, 48, 0.03) 16px
+  );
+}
+
+/* Scrollbar customizado para mobile */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+/* Safe area para notch */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Animação da rota no mapa */
+@keyframes drawRoute {
+  0% { stroke-dashoffset: 200; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.route-path {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: drawRoute 2s ease-in-out infinite;
+}
+
+/* Pulso do usuário no mapa */
+@keyframes userPulse {
+  0% { r: 12; opacity: 0.35; }
+  50% { r: 18; opacity: 0.15; }
+  100% { r: 12; opacity: 0.35; }
+}
+
+.user-pulse-ring {
+  animation: userPulse 2s ease-in-out infinite;
+}
+
+/* Respeitar preferência de movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  .route-path,
+  .user-pulse-ring,
+  .sanfona-bar,
+  .pulse-ring,
+  .pulse-dot {
+    animation: none;
+  }
+  .route-path {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Hide scrollbar para chips de filtro */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fundo fora do app em telas grandes */
+@media (min-width: 431px) {
+  body {
+    background-color: #1A0A04;
+  }
+
+  #app-shell {
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+    min-height: 100dvh;
+  }
+}
+
+/* Previne zoom em inputs no iOS */
+input[type="text"],
+input[type="search"],
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+/* Toque mais responsivo */
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Texto não selecionável em botões */
+button {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Drawers e modais dentro do container do app */
+.app-drawer {
+  max-width: 430px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+}
+
+.app-drawer[data-open="true"] {
+  transform: translateX(-50%) translateY(0);
+}
+
+.app-drawer[data-open="false"] {
+  transform: translateX(-50%) translateY(100%);
+}
+
+.leaflet-container {
+  font-family: var(--font-sans, sans-serif);
+  background: #EDF1F3;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.leaflet-popup-content {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 8px 12px;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
