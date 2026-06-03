@@ -14,18 +14,9 @@ export const metadata: Metadata = {
   generator: 'v0.app',
   icons: {
     icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
+      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
+      { url: '/icon-dark-32x32.png',  media: '(prefers-color-scheme: dark)'  },
+      { url: '/icon.svg', type: 'image/svg+xml' },
     ],
     apple: '/apple-icon.png',
   },
@@ -34,26 +25,22 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,   // permite zoom de acessibilidade
+  userScalable: true,
   themeColor: '#D85A30',
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR" className={`${_geist.variable} ${_geistMono.variable} ${_lora.variable} bg-background`}>
       <body className="font-sans antialiased min-h-dvh">
-        {/* Fundo escuro fora do app — só visível em desktop */}
-        <div className="min-h-dvh flex items-start justify-center">
-          {/* Container do app — max 430px, simula celular */}
+        {/* Em desktop: fundo escuro + app centralizado; em mobile: full-width */}
+        <div className="min-h-dvh flex items-start justify-center sm:bg-[#1A0A04]">
           <div
             id="app-shell"
-            className="relative w-full min-h-dvh bg-background overflow-hidden"
-            style={{ maxWidth: "430px" }}
+            className="relative w-full min-h-dvh bg-background sm:max-w-[430px] sm:shadow-[0_0_60px_rgba(0,0,0,0.5)]"
           >
             {children}
           </div>

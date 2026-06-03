@@ -69,9 +69,9 @@ export function CulturalGuide({ event, onBack, onRestart }: Props) {
         onBack={onBack}
       />
 
-      <main className="flex-1 overflow-y-auto pb-4">
+      <main className="flex-1 overflow-y-auto pb-6 safe-area-bottom">
         {/* 1. Hero do evento */}
-        <section aria-labelledby="hero-title" className="px-5 pt-4">
+        <section aria-labelledby="hero-title" className="px-4 sm:px-5 pt-4">
           <div
             className={cn(
               "relative rounded-2xl p-6 overflow-hidden",
@@ -142,7 +142,7 @@ export function CulturalGuide({ event, onBack, onRestart }: Props) {
         )}
 
         {/* 5. Rodapé de ação */}
-        <div className="mt-8 px-5 pb-2">
+        <div className="mt-8 px-4 sm:px-5 pb-2">
           <button
             onClick={onRestart}
             className="flex h-[54px] w-full items-center justify-center gap-2 rounded-[14px] bg-[#1D9E75] text-[15px] font-medium text-white transition-colors hover:bg-[#178A65]"
@@ -176,7 +176,7 @@ function VenueSection({
   categoryColor: { bg: string; text: string; bgSoft: string };
 }) {
   return (
-    <section aria-labelledby="venue-title" className="mt-8 px-5">
+    <section aria-labelledby="venue-title" className="mt-8 px-4 sm:px-5">
       <h2
         id="venue-title"
         className="mb-3 flex items-center gap-2 text-lg font-medium text-foreground"
@@ -228,7 +228,7 @@ function ArtistsSection({
   categoryColor: { bg: string; text: string; bgSoft: string };
 }) {
   return (
-    <section aria-labelledby="artists-title" className="mt-8 px-5">
+    <section aria-labelledby="artists-title" className="mt-8 px-4 sm:px-5">
       <h2
         id="artists-title"
         className="mb-3 flex items-center gap-2 text-lg font-medium text-foreground"
@@ -313,7 +313,7 @@ function ArtistCard({
 // ===== Seção "Você sabia?" =====
 function FunFactsSection({ funFacts }: { funFacts: string[] }) {
   return (
-    <section aria-labelledby="funfacts-title" className="mt-8 px-5">
+    <section aria-labelledby="funfacts-title" className="mt-8 px-4 sm:px-5">
       <h2
         id="funfacts-title"
         className="mb-3 flex items-center gap-2 text-lg font-medium text-foreground"

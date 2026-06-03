@@ -66,7 +66,7 @@ export function AllGuidesSheet({ events, onClose, onSelectGuide }: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="guides-sheet-title"
-        className="relative z-10 w-full max-h-[85dvh] bg-[#FFF8EE] rounded-t-3xl shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-300 ease-out"
+        className="relative z-10 w-full sm:max-w-[430px] max-h-[85dvh] bg-[#FFF8EE] rounded-t-3xl shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-300 ease-out"
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">

@@ -234,7 +234,7 @@ export function VoiceAssistant({ context, onNavigate }: Props) {
   }, [startListening, stopListening]);
 
   return (
-    <div className="pointer-events-none fixed bottom-6 left-4 z-50 flex flex-col items-start gap-3">
+    <div className="pointer-events-none fixed bottom-6 right-4 sm:right-auto z-50 flex flex-col items-end sm:items-start gap-3 [&>*]:pointer-events-auto">
       <div
         role="status"
         aria-live="polite"
