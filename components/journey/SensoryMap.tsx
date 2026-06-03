@@ -1008,7 +1008,7 @@ export function SensoryMap({
       </div>
 
       {/* Mapa Leaflet */}
-      <div className="relative mx-4 mt-4 flex-1 overflow-hidden rounded-2xl border border-border">
+      <div className="relative mx-3 sm:mx-4 mt-4 flex-1 overflow-hidden rounded-2xl border border-border">
         <div ref={mapRef} style={{ height: "100%", minHeight: "280px", width: "100%" }} />
 
         {/* Botão centralizar */}
@@ -1131,7 +1131,7 @@ export function SensoryMap({
 
       {/* Painel GPS com passos da rota */}
       {gpsMode && step && (
-        <div className="fixed inset-x-0 bottom-0 z-50">
+        <div className="fixed inset-x-0 sm:left-1/2 sm:-translate-x-1/2 sm:w-[430px] bottom-0 z-50">
           <div className="absolute inset-0 bg-black/20" onClick={closeGps} aria-hidden="true" />
           <div className="relative mx-4 mb-6 rounded-2xl bg-card border border-border shadow-2xl overflow-hidden">
             <div className="flex h-1">

@@ -241,7 +241,8 @@
 }
 
 /* Fundo fora do app em telas grandes */
-@media (min-width: 431px) {
+/* Desktop: fundo escuro gerenciado via Tailwind sm: no layout.tsx */
+@media (min-width: 640px) {
   body {
     background-color: #1A0A04;
   }
@@ -274,9 +275,10 @@ button {
 
 /* Drawers e modais dentro do container do app */
 .app-drawer {
-  max-width: 430px;
+  max-width: min(430px, 100vw);
   left: 50%;
   transform: translateX(-50%) translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .app-drawer[data-open="true"] {

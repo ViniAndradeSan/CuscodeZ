@@ -217,7 +217,7 @@ export function EventSearch({
     <div className="min-h-dvh bg-[#FDF6E3] flex flex-col">
       <Bandeirolas rows={2} />
       {/* Header fixo */}
-      <div className="px-4 pt-4 pb-2">
+      <div className="px-4 sm:px-5 pt-4 pb-2">
         <div className="flex items-center gap-2 mb-3">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D85A30] opacity-75" />
@@ -235,7 +235,7 @@ export function EventSearch({
 
       {/* Hint de acessibilidade */}
       {hintVisible && (
-        <div className="mx-4 mb-2 flex items-start gap-2.5 rounded-xl bg-[#E1F5EE] px-3 py-2.5 border border-[#1D9E75]/20">
+        <div className="mx-4 sm:mx-5 mb-2 flex items-start gap-2.5 rounded-xl bg-[#E1F5EE] px-3 py-2.5 border border-[#1D9E75]/20">
           <IconInfoCircle size={16} className="text-[#0F6E56] mt-0.5 shrink-0" aria-hidden="true" />
           <p className="text-[12px] text-[#0F6E56] leading-snug flex-1">
             Use os filtros abaixo para encontrar eventos com os recursos de acessibilidade que você precisa.
@@ -251,7 +251,7 @@ export function EventSearch({
       )}
 
       {/* Barra de busca */}
-      <div className="px-4 py-3" role="search">
+      <div className="px-4 sm:px-5 py-3" role="search">
         <div className="relative">
           <IconSearch
             size={20}
@@ -280,14 +280,14 @@ export function EventSearch({
       </div>
 
       {/* Filtros horizontais com label contextual */}
-      <div className="px-4 pb-3">
+      <div className="px-4 sm:px-5 pb-3">
         <p className="text-xs font-medium text-[#5C4033] mb-2">
           {activeFilters.size === 0
             ? "Filtrar por recurso disponível no evento:"
             : "Mostrando eventos com:"}
         </p>
         <div
-          className="flex gap-2 overflow-x-auto hide-scrollbar pb-1"
+          className="flex gap-2 flex-wrap sm:flex-nowrap overflow-x-auto hide-scrollbar pb-1"
           role="group"
           aria-label="Filtros de acessibilidade"
         >
@@ -317,7 +317,7 @@ export function EventSearch({
       </div>
 
       {/* Contagem de resultados */}
-      <div className="px-4 pb-2 flex items-center justify-between" aria-live="polite" aria-atomic="true">
+      <div className="px-4 sm:px-5 pb-2 flex items-center justify-between" aria-live="polite" aria-atomic="true">
         <span className="text-sm text-[#5C4033]">
           {filteredEvents.length === MOCK_EVENTS.length
             ? `${filteredEvents.length} eventos disponíveis`
@@ -334,7 +334,7 @@ export function EventSearch({
       </div>
 
       {/* Lista de eventos */}
-      <div className="flex-1 px-4 pb-24 overflow-y-auto">
+      <div className="flex-1 px-4 sm:px-5 pb-28 sm:pb-24 overflow-y-auto">
         {filteredEvents.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <IconMoodEmpty size={64} className="text-[#5C4033]/30 mb-4" aria-hidden="true" />
@@ -458,7 +458,7 @@ export function EventSearch({
                   </div>
 
                   {/* Botões */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mt-auto">
                     <button
                       ref={(el) => {
                         if (el) tipsButtonRefs.current.set(event.id, el);
@@ -596,7 +596,7 @@ export function EventSearch({
         <button
           onClick={() => setShowGuidesModal(true)}
           aria-label="Ver todos os guias culturais"
-          className="fixed bottom-20 left-4 z-40 flex items-center gap-2 rounded-full bg-[#2D1810] px-4 py-3 text-sm font-medium text-[#FDF6E3] shadow-lg transition-all hover:bg-[#1A0A04] active:scale-95"
+          className="fixed bottom-20 left-4 sm:left-auto z-40 flex items-center gap-2 rounded-full bg-[#2D1810] px-4 py-3 text-sm font-medium text-[#FDF6E3] shadow-lg transition-all hover:bg-[#1A0A04] active:scale-95 [container-type:inline-size]"
         >
           <IconBooks size={18} aria-hidden="true" />
           Guias culturais
@@ -616,7 +616,7 @@ export function EventSearch({
       )}
 
       {/* Progress dots */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#FDF6E3] to-transparent pt-8 pb-6 pointer-events-none">
+      <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-[#FDF6E3] to-transparent pt-8 pb-4 pointer-events-none">
         <ProgressDots currentStep={0} totalSteps={4} />
       </div>
     </div>
