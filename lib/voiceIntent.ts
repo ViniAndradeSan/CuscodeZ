@@ -5,7 +5,7 @@ export type VoiceAction =
   // Navegação entre telas
   | { type: "go-to-search" }
   | { type: "go-to-map" }
-  | { type: "go-to-guide" }
+  | { type: "go-to-guide"; eventName?: string }
   | { type: "go-to-calm-exit" }
   | { type: "restart" }
   // Eventos
@@ -46,10 +46,12 @@ export const VALID_ACTIONS = new Set([
 // ─────────────────────────────────────────────────────────────────────────────
 export type VoiceContext = {
   currentStep: string;
-  activeFilters?: string[];      // filtros ativos no EventSearch
-  activeMapFilters?: string[];   // filtros ativos no SensoryMap
-  selectedEventName?: string;    // evento atualmente selecionado
-  availableEvents?: string[];    // lista de nomes de eventos disponíveis
+  activeFilters?: string[];       // filtros ativos no EventSearch
+  activeMapFilters?: string[];    // filtros ativos no SensoryMap
+  selectedEventName?: string;     // evento atualmente selecionado
+  availableEvents?: string[];     // lista de nomes de eventos disponíveis
+  lastAction?: string;            // última ação executada pelo assistente
+  lastUserUtterance?: string;     // última fala do usuário (para continuidade de contexto)
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -85,6 +87,14 @@ export async function resolveVoiceIntent(
       const eventName = typeof json.eventName === "string" ? json.eventName.trim() : "";
       if (!eventName) throw new Error("Faltou eventName");
       return { action: { type: actionValue as any, eventName }, message };
+    }
+
+    if (actionValue === "go-to-guide") {
+      const eventName = typeof json.eventName === "string" ? json.eventName.trim() : "";
+      return {
+        action: { type: "go-to-guide", eventName: eventName || undefined },
+        message,
+      };
     }
 
     if (actionValue === "toggle-filter") {

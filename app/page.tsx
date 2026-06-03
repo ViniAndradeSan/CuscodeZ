@@ -102,10 +102,31 @@ export default function Home() {
           else speak("Precisa escolher um evento antes de ir pro mapa.");
           break;
 
-        case "go-to-guide":
-          if (selectedEvent) setStep("guide");
-          else speak("Precisa escolher um evento antes de ver o guia.");
+        case "go-to-guide": {
+          if (action.eventName) {
+            const query = action.eventName.toLowerCase();
+            const matched = MOCK_EVENTS.find(
+              (e) =>
+                e.name.toLowerCase().includes(query) ||
+                query.includes(e.name.toLowerCase())
+            );
+            if (matched) {
+              setSelectedEvent(matched);
+              setNeeds(new Set());
+              setStep("guide");
+              break;
+            }
+            speak("Não encontrei esse evento. Pode repetir o nome do guia?");
+            break;
+          }
+
+          if (selectedEvent) {
+            setStep("guide");
+          } else {
+            speak("Precisa escolher um evento antes de ver o guia.");
+          }
           break;
+        }
 
         case "go-to-calm-exit":
           setStep("calm-exit");

@@ -32,9 +32,18 @@ export function VoiceAssistant({ context, onNavigate }: Props) {
   const transcriptRef = useRef<string>("");
   const silenceTimerRef = useRef<number | null>(null);
   const fallbackTimerRef = useRef<number | null>(null);
-  // Mantém o contexto mais recente disponível nos callbacks sem re-criar funções
+
+  // Mantém o contexto mais recente nos callbacks sem recriar funções
   const contextRef = useRef<VoiceContext>(context);
   useEffect(() => { contextRef.current = context; }, [context]);
+
+  // Mantém onNavigate sempre atualizado — evita closure stale com selectedEvent antigo
+  const onNavigateRef = useRef<(action: VoiceAction) => void>(onNavigate);
+  useEffect(() => { onNavigateRef.current = onNavigate; }, [onNavigate]);
+
+  // Rastreia a última ação executada e a última fala do usuário para contexto inteligente
+  const lastActionRef = useRef<string>("nenhuma");
+  const lastUtteranceRef = useRef<string>("nenhuma");
 
   useEffect(() => {
     setSupported(Boolean(getSpeechRecognition()) && isSecureContext());
@@ -90,13 +99,24 @@ export function VoiceAssistant({ context, onNavigate }: Props) {
       fallbackTimerRef.current = timeoutId;
 
       try {
-        // Passa o contexto mais recente (via ref, sem recriar o callback)
-        const intent = await resolveVoiceIntent(finalTranscript, contextRef.current);
+        // Envia contexto completo — incluindo última ação e última fala do usuário
+        const enrichedContext: VoiceContext = {
+          ...contextRef.current,
+          lastAction: lastActionRef.current,
+          lastUserUtterance: lastUtteranceRef.current,
+        };
+
+        const intent = await resolveVoiceIntent(finalTranscript, enrichedContext);
         window.clearTimeout(timeoutId);
         setCurrentStatus("idle");
         setStatusText(intent.message);
         setShowBubble(true);
-        onNavigate(intent.action);
+
+        // Atualiza o histórico para a próxima chamada
+        lastActionRef.current = intent.action.type;
+        lastUtteranceRef.current = finalTranscript;
+
+        onNavigateRef.current(intent.action);
         speak(intent.message, hideBubbleLater);
       } catch {
         window.clearTimeout(timeoutId);
@@ -106,8 +126,6 @@ export function VoiceAssistant({ context, onNavigate }: Props) {
         speak("Estou com dificuldade agora, tente de novo", hideBubbleLater);
       }
     },
-    // onNavigate intencionalmente fora para não recriar o callback a cada render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [hideBubbleLater, setCurrentStatus]
   );
 
