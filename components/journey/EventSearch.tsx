@@ -629,13 +629,8 @@ export function EventSearch({
       )}
 
       {/* Progress dots */}
-<<<<<<< HEAD
       <div className="fixed bottom-0 left-0 right-0 bg-linear-to-t from-[#FDF6E3] to-transparent pt-8 pb-6 pointer-events-none">
         <ProgressDots currentStep={0} totalSteps={3} />
-=======
-      <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-[#FDF6E3] to-transparent pt-8 pb-4 pointer-events-none">
-        <ProgressDots currentStep={0} totalSteps={4} />
->>>>>>> 5417572761268b3989ca1ea0d115eeab8419f6d9
       </div>
     </div>
   );
