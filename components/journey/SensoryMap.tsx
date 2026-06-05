@@ -332,6 +332,13 @@ export function SensoryMap({
   const [isShowingArrivalConfirmation, setIsShowingArrivalConfirmation] = useState(false);
   const [osmLoading, setOsmLoading] = useState<Set<FilterKey>>(new Set());
   const [osmError, setOsmError] = useState<FilterKey | null>(null);
+  const [routeSensoryMeta, setRouteSensoryMeta] = useState<{
+    avoidNoise?: boolean;
+    preferAccessible?: boolean;
+    noiseWarning?: boolean;
+    noiseExposurePercent?: number;
+    accessibleSegmentsPercent?: number;
+  } | null>(null);
 
   const [internalFilters, setInternalFilters] = useState<Set<FilterKey>>(() => {
     const initial = new Set<FilterKey>();
@@ -727,7 +734,9 @@ export function SensoryMap({
       setRouteLoading(true);
       setGpsError(null);
 
-      const proxyUrl = `/api/route?fromLat=${from[0]}&fromLng=${from[1]}&toLat=${destination.lat}&toLng=${destination.lng}`;
+      // Passa filtros ativos ao proxy para rota sensorial adaptada
+      const filtersParam = [...activeFilters].join(",");
+      const proxyUrl = `/api/route?fromLat=${from[0]}&fromLng=${from[1]}&toLat=${destination.lat}&toLng=${destination.lng}&filters=${encodeURIComponent(filtersParam)}`;
 
       const parseFallbackText = (text: string) => {
         return text
@@ -751,6 +760,13 @@ export function SensoryMap({
         const geometry = route.geometry;
         const legs = route.legs[0];
 
+        // Captura metadados sensoriais injetados pela API
+        if (route.sensoryMeta) {
+          setRouteSensoryMeta(route.sensoryMeta);
+        } else {
+          setRouteSensoryMeta(null);
+        }
+
         const steps: RouteStep[] = legs.steps
           .filter((s: any) => s.maneuver.type !== "depart" || legs.steps.indexOf(s) === 0)
           .map((s: any) => ({
@@ -770,9 +786,15 @@ export function SensoryMap({
 
         if (routeLayerRef.current) map.removeLayer(routeLayerRef.current);
 
+        // Cor da rota varia com o estado sensorial
+        const meta = route.sensoryMeta;
+        let routeColor = "#1D9E75"; // verde padrão
+        if (meta?.noiseWarning) routeColor = "#E67E22"; // laranja = passa por zona ruidosa
+        else if (meta?.preferAccessible && meta?.accessibleSegmentsPercent > 20) routeColor = "#1F5C8F"; // azul = rota acessível
+
         routeLayerRef.current = L.geoJSON(geometry, {
           style: {
-            color: "#1D9E75",
+            color: routeColor,
             weight: 5,
             opacity: 0.85,
             lineCap: "round",
@@ -898,15 +920,30 @@ export function SensoryMap({
     if (gpsError) return { icon: "⚠️", text: gpsError, error: true };
     if (osmError) return { icon: "⚠️", text: `Falha ao carregar dados de "${FILTER_CONFIG[osmError]?.label}". Toque no filtro para tentar novamente.`, error: true };
     if (gpsLoading) return { icon: "📡", text: "Obtendo sua localização via GPS...", error: false };
-    if (routeLoading) return { icon: "🗺️", text: "Calculando rota acessível via OpenStreetMap...", error: false };
+    if (routeLoading) {
+      const filterHints: string[] = [];
+      if (activeFilters.has("ruido")) filterHints.push("evitando ruído");
+      if (activeFilters.has("acessivel")) filterHints.push("priorizando acessibilidade");
+      const hint = filterHints.length ? ` (${filterHints.join(", ")})` : "";
+      return { icon: "🗺️", text: `Calculando rota${hint}...`, error: false };
+    }
     if (isOsmLoading) return { icon: "🔄", text: `Buscando dados reais: ${loadingFilterNames}...`, error: false };
+    // Após rota calculada, mostrar meta sensorial
+    if (gpsMode && routeSensoryMeta) {
+      if (routeSensoryMeta.noiseWarning)
+        return { icon: "🔊", text: "⚠️ Atenção: parte desta rota passa por zonas ruidosas. Considere usar protetor auricular.", error: true };
+      if (routeSensoryMeta.preferAccessible && (routeSensoryMeta.accessibleSegmentsPercent ?? 0) > 10)
+        return { icon: "♿", text: `Rota com trechos acessíveis (${routeSensoryMeta.accessibleSegmentsPercent}% do caminho próximo a pontos acessíveis).`, error: false };
+      if (routeSensoryMeta.avoidNoise)
+        return { icon: "🔇", text: "Rota calculada evitando zonas de alto ruído. ✅", error: false };
+    }
     if (activeFilters.has("ruido")) return { icon: "🔇", text: "Zonas sonoras proporcionais ao tipo de local — estádios e shows têm raio maior.", error: false };
     if (activeFilters.has("apoio")) return { icon: "🆘", text: "🏥 Hospital  🚒 Bombeiros  🚔 Polícia  💊 Farmácia — ícones distintos para cada serviço.", error: false };
     if (activeFilters.has("familia")) return { icon: "👨‍👩‍👧", text: "Playgrounds, lanchonetes, cafés e shoppings com estrutura para crianças.", error: false };
     if (activeFilters.has("acessivel")) return { icon: "♿", text: "Pontos acessíveis reais (OpenStreetMap) exibidos no mapa.", error: false };
     if (activeFilters.has("infraestrutura")) return { icon: "🚻", text: "Banheiros públicos e bebedouros reais no mapa.", error: false };
     return { icon: "📍", text: `Destino: ${event.name} — ${destination.label}`, error: false };
-  }, [activeFilters, gpsError, osmError, gpsLoading, routeLoading, isOsmLoading, loadingFilterNames, event.name, destination.label]);
+  }, [activeFilters, gpsError, osmError, gpsLoading, routeLoading, isOsmLoading, loadingFilterNames, gpsMode, routeSensoryMeta, event.name, destination.label]);
 
   const step = gpsMode ? routeSteps[currentStep] : null;
 
@@ -974,7 +1011,7 @@ export function SensoryMap({
       </div>
 
       {/* Mapa Leaflet */}
-      <div className="relative mx-4 mt-4 flex-1 overflow-hidden rounded-2xl border border-border">
+      <div className="relative mx-3 sm:mx-4 mt-4 flex-1 overflow-hidden rounded-2xl border border-border">
         <div ref={mapRef} style={{ height: "100%", minHeight: "280px", width: "100%" }} />
 
         {/* Botão centralizar */}
@@ -1097,7 +1134,7 @@ export function SensoryMap({
 
       {/* Painel GPS com passos da rota */}
       {gpsMode && step && (
-        <div className="fixed inset-x-0 bottom-0 z-50">
+        <div className="fixed inset-x-0 sm:left-1/2 sm:-translate-x-1/2 sm:w-[430px] bottom-0 z-50">
           <div className="absolute inset-0 bg-black/20" onClick={closeGps} aria-hidden="true" />
           <div className="relative mx-4 mb-6 rounded-2xl bg-card border border-border shadow-2xl overflow-hidden">
             <div className="flex h-1">
@@ -1141,6 +1178,16 @@ export function SensoryMap({
               {activeFilters.has("acessivel") && (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E1F5EE] px-3 py-1.5 text-[12px] font-medium text-[#0F6E56] mb-4">
                   ♿ Rota acessível via OSRM
+                </span>
+              )}
+              {routeSensoryMeta?.noiseWarning && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FEF0E7] px-3 py-1.5 text-[12px] font-medium text-[#B7460E] mb-4">
+                  🔊 Atenção: trecho com ruído elevado
+                </span>
+              )}
+              {activeFilters.has("ruido") && !routeSensoryMeta?.noiseWarning && routeSensoryMeta?.avoidNoise && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EAF4FC] px-3 py-1.5 text-[12px] font-medium text-[#1A5276] mb-4">
+                  🔇 Rota evitando zonas ruidosas ✅
                 </span>
               )}
 

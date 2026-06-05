@@ -1,7 +1,7 @@
-type Props = { 
-  current?: number; 
-  currentStep?: number; 
-  total?: number; 
+type Props = {
+  current?: number;
+  currentStep?: number;
+  total?: number;
   totalSteps?: number;
   showLabels?: boolean;
 };
@@ -15,21 +15,21 @@ const STEP_LABELS = [
 export function ProgressDots({ current, currentStep, total, totalSteps, showLabels }: Props) {
   const step = currentStep ?? current ?? 1;
   const steps = totalSteps ?? total ?? 3;
-  
+  const activeIndex = Math.max(0, Math.min(steps - 1, step - 1));
+
   return (
-    <div className="flex flex-col items-center gap-4 py-5 safe-area-bottom">
-      {/* Indicadores visuais */}
+    <div className="flex flex-col items-center gap-3 py-4 sm:py-5 safe-area-bottom">
       <div
         className="flex items-center justify-center gap-2"
         role="progressbar"
         aria-valuenow={step}
-        aria-valuemin={0}
+        aria-valuemin={1}
         aria-valuemax={steps}
         aria-label={`Etapa ${step} de ${steps}`}
       >
         {Array.from({ length: steps }).map((_, i) => {
-          const active = i === step;
-          const done = i < step;
+          const active = i === activeIndex;
+          const done = i < activeIndex;
           if (active) {
             return (
               <span
@@ -58,15 +58,10 @@ export function ProgressDots({ current, currentStep, total, totalSteps, showLabe
         })}
       </div>
 
-      {/* Labels semânticos (opcional) */}
       {showLabels && step <= steps && (
         <div className="text-center">
-          <p className="text-[13px] font-medium text-foreground">
-            {STEP_LABELS[step - 1]?.label}
-          </p>
-          <p className="text-[11px] text-muted-foreground">
-            {STEP_LABELS[step - 1]?.description}
-          </p>
+          <p className="text-[13px] font-medium text-foreground">{STEP_LABELS[step - 1]?.label}</p>
+          <p className="text-[11px] text-muted-foreground">{STEP_LABELS[step - 1]?.description}</p>
         </div>
       )}
     </div>

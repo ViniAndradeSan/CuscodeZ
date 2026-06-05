@@ -26,15 +26,15 @@ function Step({
   last?: boolean;
 }) {
   return (
-    <li className={"flex gap-4 py-5 " + (last ? "" : "border-b-[0.5px] border-border")}>
+    <li className={"flex gap-3 sm:gap-4 py-4 sm:py-5 " + (last ? "" : "border-b-[0.5px] border-border")}>
       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E1F5EE] text-[13px] font-semibold text-[#0F6E56]">
         {n}
       </span>
-      <div className="flex-1">
-        <p className="text-[15px] font-medium text-foreground">{title}</p>
-        <p className="mt-1 text-[13.5px] leading-snug text-muted-foreground">{body}</p>
+      <div className="flex-1 min-w-0">
+        <p className="text-[14px] sm:text-[15px] font-medium text-foreground">{title}</p>
+        <p className="mt-1 text-[13px] sm:text-[13.5px] leading-snug text-muted-foreground">{body}</p>
         {badge && (
-          <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#E1F5EE] px-2.5 py-1 text-[11.5px] font-medium text-[#0F6E56]">
+          <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#E1F5EE] px-2.5 py-1 text-[11px] sm:text-[11.5px] font-medium text-[#0F6E56]">
             <span aria-hidden="true">{badge.icon}</span>
             {badge.text}
           </span>
@@ -50,14 +50,19 @@ export function CalmExit({ onBack, onContinue }: Props) {
       <Bandeirolas rows={1} />
       <Header title="Sair com calma" subtitle="Rota de apoio ativada" onBack={onBack} />
 
-      <main className="flex-1 px-5 overflow-y-auto">
-        <div className="flex flex-col items-center pt-8 pb-2 text-center">
+      <main className="flex-1 px-4 sm:px-5 overflow-y-auto">
+        <div className="flex flex-col items-center pt-6 sm:pt-8 pb-2 text-center">
           <span
+<<<<<<< HEAD
             className="flex h-18 w-18 items-center justify-center rounded-full bg-[#E1F5EE]"
+=======
+            className="flex h-16 w-16 sm:h-[72px] sm:w-[72px] items-center justify-center rounded-full bg-[#E1F5EE]"
+>>>>>>> 5417572761268b3989ca1ea0d115eeab8419f6d9
             aria-hidden="true"
           >
-            <IconHeartHandshake size={32} stroke={1.75} className="text-[#0F6E56]" />
+            <IconHeartHandshake size={30} stroke={1.75} className="text-[#0F6E56]" />
           </span>
+<<<<<<< HEAD
           <h2
             id="calm-exit-title"
             className="mt-5 text-[22px] font-semibold leading-tight text-[#2D1810]"
@@ -65,6 +70,12 @@ export function CalmExit({ onBack, onContinue }: Props) {
             Tudo bem. Você não está sozinho.
           </h2>
           <p className="mt-2 max-w-75 text-[14px] text-muted-foreground">
+=======
+          <h2 className="mt-4 sm:mt-5 text-[20px] sm:text-[22px] font-medium leading-tight text-foreground">
+            Tudo bem. Você não está sozinho.
+          </h2>
+          <p className="mt-2 max-w-[300px] text-[13px] sm:text-[14px] text-muted-foreground">
+>>>>>>> 5417572761268b3989ca1ea0d115eeab8419f6d9
             Encontramos o caminho mais curto e tranquilo até um ponto de apoio. Siga no seu ritmo.
           </p>
         </div>
@@ -77,31 +88,39 @@ export function CalmExit({ onBack, onContinue }: Props) {
           />
           <Step
             n={2}
-            title="Vire a esquerda na saida B"
+            title="Vire a esquerda na saída B"
             body="Caminho plano, sem escadas, boa iluminação. Cerca de 180 metros."
             badge={{ icon: <IconWheelchair size={13} stroke={2} />, text: "Totalmente acessível" }}
           />
           <Step
             n={3}
             title="Ponto de apoio — tenda verde"
-            body="Equipe de saude, agua, cadeiras, ambiente silencioso. Aberto ate meia-noite."
+            body="Equipe de saúde, água, cadeiras, ambiente silencioso. Aberto até meia-noite."
             badge={{ icon: <IconFirstAidKit size={13} stroke={2} />, text: "Equipe de apoio presente" }}
             last
           />
         </ol>
       </main>
 
-      <div className="px-5 pt-4 pb-2">
+      <div className="px-4 sm:px-5 pt-4 pb-2 safe-area-bottom">
         <button
           onClick={onContinue}
+<<<<<<< HEAD
           className="flex h-13.5 w-full items-center justify-center gap-2 rounded-[14px] bg-[#1D9E75] text-[15px] font-medium text-white hover:bg-[#178A65]"
+=======
+          className="flex h-[52px] sm:h-[54px] w-full items-center justify-center gap-2 rounded-[14px] bg-[#1D9E75] text-[14px] sm:text-[15px] font-medium text-white hover:bg-[#178A65] active:scale-[0.98] transition-all"
+>>>>>>> 5417572761268b3989ca1ea0d115eeab8419f6d9
         >
           <IconNavigation size={18} stroke={2} />
           Iniciar rota de apoio
         </button>
         <button
           onClick={onBack}
+<<<<<<< HEAD
           className="mt-2 flex h-12 w-full items-center justify-center rounded-[14px] text-[14px] font-medium text-muted-foreground hover:bg-muted"
+=======
+          className="mt-2 flex h-[44px] sm:h-[48px] w-full items-center justify-center rounded-[14px] text-[13px] sm:text-[14px] font-medium text-muted-foreground hover:bg-muted active:scale-[0.98] transition-all"
+>>>>>>> 5417572761268b3989ca1ea0d115eeab8419f6d9
         >
           Voltar ao mapa
         </button>
