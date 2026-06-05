@@ -100,6 +100,19 @@ export function EventSearch({
   const inputRef = useRef<HTMLInputElement>(null);
   const tipsButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
+  // Hint dismissível com persistência
+  useEffect(() => {
+    const isDismissed = localStorage.getItem("eventSearchHintDismissed") === "true";
+    if (isDismissed) {
+      setHintVisible(false);
+    }
+  }, []);
+
+  const handleDismissHint = () => {
+    setHintVisible(false);
+    localStorage.setItem("eventSearchHintDismissed", "true");
+  };
+
   // Estado controlado ou interno
   const query = externalQuery !== undefined ? externalQuery : internalQuery;
   const setQuery = (v: string) => {
@@ -241,8 +254,8 @@ export function EventSearch({
             Use os filtros abaixo para encontrar eventos com os recursos de acessibilidade que você precisa.
           </p>
           <button
-            onClick={() => setHintVisible(false)}
-            className="shrink-0 p-1 rounded hover:bg-[#1D9E75]/10 transition-colors min-w-[28px] min-h-[28px] flex items-center justify-center"
+            onClick={handleDismissHint}
+            className="shrink-0 p-1 rounded hover:bg-[#1D9E75]/10 transition-colors min-w-7 min-h-7 flex items-center justify-center"
             aria-label="Fechar dica"
           >
             <IconX size={14} className="text-[#0F6E56]" />
@@ -264,13 +277,13 @@ export function EventSearch({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar evento ou local..."
-            className="w-full pl-10 pr-10 py-3 rounded-xl bg-white border border-[#E8D5B5] text-[#2D1810] placeholder:text-[#5C4033]/50 focus:outline-none focus:ring-2 focus:ring-[#D85A30]/50 min-h-[48px]"
+            className="w-full pl-10 pr-10 py-3 rounded-xl bg-white border border-[#E8D5B5] text-[#2D1810] placeholder:text-[#5C4033]/50 focus:outline-none focus:ring-2 focus:ring-[#D85A30]/50 min-h-12"
             aria-label="Buscar evento ou local"
           />
           {query && (
             <button
               onClick={() => setQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-[#E8D5B5]/50 min-w-[36px] min-h-[36px] flex items-center justify-center"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-[#E8D5B5]/50 min-w-9 min-h-9 flex items-center justify-center"
               aria-label="Limpar busca"
             >
               <IconX size={18} className="text-[#5C4033]/70" />
@@ -299,7 +312,7 @@ export function EventSearch({
                 onClick={() => toggleFilter(filter.id)}
                 aria-pressed={isActive}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-2.5 rounded-full text-sm whitespace-nowrap transition-all min-h-[44px]",
+                  "flex items-center gap-1.5 px-3 py-2.5 rounded-full text-sm whitespace-nowrap transition-all min-h-11",
                   isActive
                     ? "bg-[#D85A30] text-white font-medium"
                     : "bg-white border border-[#E8D5B5] text-[#5C4033] hover:border-[#D85A30]/50"
@@ -326,7 +339,7 @@ export function EventSearch({
         {(activeFilters.size > 0 || query.trim()) && (
           <button
             onClick={clearFilters}
-            className="text-xs text-[#D85A30] font-medium hover:underline py-1 px-2 min-h-[36px]"
+            className="text-xs text-[#D85A30] font-medium hover:underline py-1 px-2 min-h-9"
           >
             Limpar filtros
           </button>
@@ -343,7 +356,7 @@ export function EventSearch({
             </p>
             <button
               onClick={clearFilters}
-              className="px-4 py-3 rounded-xl bg-[#D85A30] text-white font-medium min-h-[48px]"
+              className="px-4 py-3 rounded-xl bg-[#D85A30] text-white font-medium min-h-12"
             >
               Limpar filtros
             </button>
@@ -356,7 +369,7 @@ export function EventSearch({
                 className="bg-white rounded-2xl border border-[#E8D5B5] overflow-hidden"
                 aria-label={`${event.name}: ${CATEGORY_LABELS[event.category]} em ${event.location}, ${event.date} às ${event.time}. Ruído ${event.noiseLevel}. ${event.accessibility.length} recursos de acessibilidade.`}
               >
-                <div className="p-4">
+              <div className="p-3">
                   {/* Badge categoria e ruído */}
                   <div className="flex items-center justify-between mb-2">
                     <span
@@ -387,7 +400,7 @@ export function EventSearch({
                   <h2 className="font-semibold text-lg text-[#2D1810] mb-1">
                     {event.name}
                   </h2>
-                  <div className="flex items-center gap-3 text-sm text-[#5C4033] mb-3">
+                  <div className="flex items-center gap-3 text-sm text-[#5C4033] mb-2">
                     <span className="flex items-center gap-1">
                       <IconMapPin size={14} aria-hidden="true" />
                       {event.location}
@@ -399,13 +412,13 @@ export function EventSearch({
                   </div>
 
                   {/* Recursos de acessibilidade */}
-                  <div className="mb-3">
+                  <div className="mb-2">
                     <p className="text-[11px] font-medium text-[#0F6E56] mb-1.5 flex items-center gap-1">
                       <IconCheck size={11} className="text-[#0F6E56]" aria-hidden="true" />
                       Recursos de acessibilidade disponíveis
                     </p>
                     <div className="flex flex-wrap gap-1.5">
-                      {event.accessibility.slice(0, 3).map((feat) => (
+                      {event.accessibility.slice(0, 2).map((feat) => (
                         <span
                           key={feat}
                           className="text-xs px-2 py-1 rounded-full bg-[#E1F5EE] text-[#0F6E56] border border-[#1D9E75]/20 flex items-center gap-1"
@@ -414,16 +427,16 @@ export function EventSearch({
                           {ACCESSIBILITY_LABELS[feat]}
                         </span>
                       ))}
-                      {event.accessibility.length > 3 && (
+                      {event.accessibility.length > 2 && (
                         <span className="text-xs px-2 py-1 rounded-full bg-[#E1F5EE] text-[#0F6E56] border border-[#1D9E75]/20">
-                          +{event.accessibility.length - 3} recursos
+                          +{event.accessibility.length - 2} recursos
                         </span>
                       )}
                     </div>
                   </div>
 
                   {/* Barra de lotação */}
-                  <div className="mb-4">
+                  <div className="mb-3">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs text-[#5C4033]">Lotação agora</span>
                       <span
@@ -467,7 +480,7 @@ export function EventSearch({
                       aria-expanded={openTipsId === event.id}
                       aria-controls={`tips-${event.id}`}
                       className={cn(
-                        "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-medium transition-colors min-h-[48px] text-sm",
+                        "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-medium transition-colors min-h-12 text-sm",
                         openTipsId === event.id
                           ? "border-[#D85A30] bg-[#D85A30]/5 text-[#D85A30]"
                           : "border-[#E8D5B5] text-[#5C4033] hover:bg-[#E8D5B5]/30"
@@ -486,7 +499,7 @@ export function EventSearch({
                     <button
                       onClick={() => onSelect(event, activeFilters)}
                       aria-label={`Escolher ${event.name} e ir para o mapa`}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#D85A30] text-white font-medium hover:bg-[#C04A20] transition-colors min-h-[48px] text-sm"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#D85A30] text-white font-medium hover:bg-[#C04A20] transition-colors min-h-12 text-sm"
                     >
                       Escolher
                       <IconChevronRight size={16} aria-hidden="true" />
@@ -499,7 +512,7 @@ export function EventSearch({
                   id={`tips-${event.id}`}
                   className={cn(
                     "overflow-hidden transition-all duration-300 ease-in-out",
-                    openTipsId === event.id ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+                    openTipsId === event.id ? "max-h-150 opacity-100" : "max-h-0 opacity-0"
                   )}
                 >
                   <div className="border-t border-[#E8D5B5] bg-[#FDF6E3]/50 p-4">
@@ -579,7 +592,7 @@ export function EventSearch({
 
                     <button
                       onClick={() => toggleTips(event.id)}
-                      className="w-full mt-4 py-3 text-sm text-[#5C4033] hover:text-[#2D1810] min-h-[44px]"
+                      className="w-full mt-4 py-3 text-sm text-[#5C4033] hover:text-[#2D1810] min-h-11"
                     >
                       Fechar dicas
                     </button>
@@ -616,8 +629,8 @@ export function EventSearch({
       )}
 
       {/* Progress dots */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#FDF6E3] to-transparent pt-8 pb-6 pointer-events-none">
-        <ProgressDots currentStep={0} totalSteps={4} />
+      <div className="fixed bottom-0 left-0 right-0 bg-linear-to-t from-[#FDF6E3] to-transparent pt-8 pb-6 pointer-events-none">
+        <ProgressDots currentStep={0} totalSteps={3} />
       </div>
     </div>
   );

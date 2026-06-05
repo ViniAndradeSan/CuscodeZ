@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { EventSearch } from "@/components/journey/EventSearch";
 import { SensoryMap } from "@/components/journey/SensoryMap";
 import { CalmExit } from "@/components/journey/CalmExit";
 import { CulturalGuide } from "@/components/journey/CulturalGuide";
+import { SOSButton } from "@/components/journey/SOSButton";
 import { VoiceAssistant } from "@/components/VoiceAssistant";
 import type { EventItem } from "@/types/event";
 import type { VoiceAction, VoiceContext } from "@/lib/voiceIntent";
@@ -12,7 +13,7 @@ type FilterKey = "ruido" | "acessivel" | "familia" | "apoio" | "infraestrutura" 
 import { MOCK_EVENTS } from "@/lib/events";
 import { speak } from "@/lib/voiceSynth";
 
-type Step = "event-search" | "map" | "calm-exit" | "guide";
+type Step = "event-search" | "map" | "guide";
 
 // Mapeamento: id do filtro de busca → id do filtro do mapa (para tradução de contexto)
 const SEARCH_FILTER_TO_MAP: Record<string, string> = {
@@ -38,6 +39,26 @@ export default function Home() {
 
   // Controle do GPS — voz pode disparar
   const [startGpsSignal, setStartGpsSignal] = useState(0);
+
+  // CalmExit agora é um overlay — pode ser aberto de qualquer tela
+  const [isShowingCalmExit, setIsShowingCalmExit] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Bloquear scroll do body quando modal está aberto
+  useEffect(() => {
+    if (isShowingCalmExit) {
+      document.body.style.overflow = "hidden";
+      // Foco automático no modal para acessibilidade
+      setTimeout(() => {
+        modalRef.current?.focus();
+      }, 0);
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isShowingCalmExit]);
 
   // ──────────────────────────────────────────────────────────────
   // Handlers de navegação
@@ -129,7 +150,7 @@ export default function Home() {
         }
 
         case "go-to-calm-exit":
-          setStep("calm-exit");
+          setIsShowingCalmExit(true);
           break;
 
         case "restart":
@@ -212,7 +233,7 @@ export default function Home() {
           break;
 
         case "sos":
-          setStep("calm-exit");
+          setIsShowingCalmExit(true);
           break;
 
         case "none":
@@ -243,8 +264,8 @@ export default function Home() {
           event={selectedEvent}
           needs={needs}
           onBack={() => setStep("event-search")}
-          onContinue={() => setStep("calm-exit")}
-          onSOS={() => setStep("calm-exit")}
+          onContinue={() => setIsShowingCalmExit(true)}
+          onSOS={() => setIsShowingCalmExit(true)}
           // Props controladas externamente (pela voz)
           externalFilters={mapFilters}
           onFiltersChange={setMapFilters}
@@ -252,18 +273,53 @@ export default function Home() {
         />
       )}
 
-      {step === "calm-exit" && (
-        <CalmExit
-          onBack={() => setStep("map")}
-          onContinue={() => setStep("guide")}
-        />
-      )}
-
       {step === "guide" && selectedEvent && (
         <CulturalGuide
           event={selectedEvent}
-          onBack={() => setStep("calm-exit")}
+          onBack={() => setStep("map")}
           onRestart={handleRestart}
+        />
+      )}
+
+      {/* CalmExit como overlay modal — acessível de qualquer tela */}
+      {isShowingCalmExit && (
+        <div 
+          ref={modalRef}
+          className="fixed inset-0 z-50 flex flex-col"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="calm-exit-title"
+          tabIndex={-1}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              setIsShowingCalmExit(false);
+            }
+          }}
+        >
+          {/* Backdrop semitransparente */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setIsShowingCalmExit(false)}
+            aria-hidden="true"
+          />
+          {/* Modal container — ocupa a tela inteira com conteúdo */}
+          <div className="relative z-10 flex min-h-dvh flex-col overflow-y-auto">
+            <CalmExit
+              onBack={() => setIsShowingCalmExit(false)}
+              onContinue={() => {
+                setIsShowingCalmExit(false);
+                setStep("guide");
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Botão SOS flutuante — visível apenas no Mapa e Guia, não no modal */}
+      {!isShowingCalmExit && step !== "event-search" && (
+        <SOSButton 
+          onClick={() => setIsShowingCalmExit(true)}
+          compact={step === "guide"}
         />
       )}
 

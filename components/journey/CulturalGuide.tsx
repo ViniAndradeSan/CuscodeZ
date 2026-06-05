@@ -145,7 +145,7 @@ export function CulturalGuide({ event, onBack, onRestart }: Props) {
         <div className="mt-8 px-5 pb-2">
           <button
             onClick={onRestart}
-            className="flex h-[54px] w-full items-center justify-center gap-2 rounded-[14px] bg-[#1D9E75] text-[15px] font-medium text-white transition-colors hover:bg-[#178A65]"
+            className="flex h-13.5 w-full items-center justify-center gap-2 rounded-[14px] bg-[#1D9E75] text-[15px] font-medium text-white transition-colors hover:bg-[#178A65]"
             aria-label="Planejar nova visita"
           >
             <IconHome size={18} strokeWidth={2} aria-hidden="true" />
@@ -153,7 +153,7 @@ export function CulturalGuide({ event, onBack, onRestart }: Props) {
           </button>
           <button
             onClick={onBack}
-            className="mt-2 flex h-[48px] w-full items-center justify-center gap-1.5 rounded-[14px] text-[14px] font-medium text-muted-foreground transition-colors hover:bg-muted"
+            className="mt-2 flex h-12 w-full items-center justify-center gap-1.5 rounded-[14px] text-[14px] font-medium text-muted-foreground transition-colors hover:bg-muted"
             aria-label="Voltar para a etapa anterior"
           >
             <IconChevronLeft size={16} aria-hidden="true" />
@@ -162,7 +162,7 @@ export function CulturalGuide({ event, onBack, onRestart }: Props) {
         </div>
       </main>
 
-      <ProgressDots current={3} total={4} />
+      <ProgressDots current={3} total={3} />
     </div>
   );
 }

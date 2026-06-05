@@ -17,6 +17,7 @@ import {
 import { Header } from "./Header";
 import { ProgressDots } from "./ProgressDots";
 import { Bandeirolas } from "./Bandeirolas";
+import { ArrivalConfirmation } from "./ArrivalConfirmation";
 import type { EventItem } from "@/types/event";
 
 // ─── Coordenadas reais dos locais em Aracaju ──────────────────────────────────
@@ -328,6 +329,7 @@ export function SensoryMap({
   const [routeLoading, setRouteLoading] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
   const [mapReady, setMapReady] = useState(false);
+  const [isShowingArrivalConfirmation, setIsShowingArrivalConfirmation] = useState(false);
   const [osmLoading, setOsmLoading] = useState<Set<FilterKey>>(new Set());
   const [osmError, setOsmError] = useState<FilterKey | null>(null);
 
@@ -838,8 +840,9 @@ export function SensoryMap({
       if (currentStep < routeSteps.length - 1) {
         setCurrentStep((s) => s + 1);
       } else {
+        // Usuário completou a rota — mostrar modal de confirmação
         setGpsMode(false);
-        onContinue();
+        setIsShowingArrivalConfirmation(true);
       }
       return;
     }
@@ -988,7 +991,7 @@ export function SensoryMap({
               map.setView([destination.lat, destination.lng], 15);
             }
           }}
-          className="absolute bottom-14 right-3 z-[1000] flex h-9 w-9 items-center justify-center rounded-full bg-card shadow-md border border-border"
+          className="absolute bottom-14 right-3 z-1000 flex h-9 w-9 items-center justify-center rounded-full bg-card shadow-md border border-border"
           aria-label="Centralizar mapa"
         >
           <IconCurrentLocation size={18} className="text-[#1D9E75]" />
@@ -998,7 +1001,7 @@ export function SensoryMap({
         <button
           type="button"
           onClick={() => setLegendOpen((prev) => !prev)}
-          className="absolute bottom-3 right-3 z-[1000] flex h-9 w-9 items-center justify-center rounded-full bg-card shadow-md border border-border"
+          className="absolute bottom-3 right-3 z-1000 flex h-9 w-9 items-center justify-center rounded-full bg-card shadow-md border border-border"
           aria-label={legendOpen ? "Fechar legenda" : "Abrir legenda"}
           aria-expanded={legendOpen}
         >
@@ -1006,7 +1009,7 @@ export function SensoryMap({
         </button>
 
         {legendOpen && (
-          <div className="absolute bottom-14 right-3 z-[1000] rounded-2xl bg-card p-3 shadow-lg border border-border w-[240px]">
+          <div className="absolute bottom-14 right-3 z-1000 rounded-2xl bg-card p-3 shadow-lg border border-border w-60">
             <p className="mb-2 text-xs font-semibold text-foreground">Legenda — dados reais OSM</p>
             <div className="flex flex-col gap-2 text-[11px] text-muted-foreground">
               <div className="flex items-center gap-2">
@@ -1057,7 +1060,7 @@ export function SensoryMap({
 
         {/* Loading overlay */}
         {(gpsLoading || routeLoading) && (
-          <div className="absolute inset-0 z-[999] flex items-center justify-center bg-background/60 backdrop-blur-sm rounded-2xl">
+          <div className="absolute inset-0 z-999 flex items-center justify-center bg-background/60 backdrop-blur-sm rounded-2xl">
             <div className="flex flex-col items-center gap-3">
               <IconLoader2 size={32} className="text-[#1D9E75] animate-spin" />
               <p className="text-sm font-medium text-[#1D9E75]">
@@ -1073,7 +1076,7 @@ export function SensoryMap({
         <button
           type="button"
           onClick={onSOS}
-          className="flex h-[54px] flex-1 items-center justify-center gap-2 rounded-[14px] border border-[#E74C3C] bg-[#FCEAE8] text-[15px] font-medium text-[#8B1A10] hover:bg-[#F9DAD6] transition-colors"
+          className="flex h-13.5 flex-1 items-center justify-center gap-2 rounded-[14px] border border-[#E74C3C] bg-[#FCEAE8] text-[15px] font-medium text-[#8B1A10] hover:bg-[#F9DAD6] transition-colors"
           aria-label="Pedir ajuda urgente"
         >
           <IconHeartOff size={18} stroke={2} aria-hidden="true" />
@@ -1083,14 +1086,14 @@ export function SensoryMap({
           type="button"
           onClick={handleMainButton}
           disabled={gpsLoading || routeLoading}
-          className="flex h-[54px] flex-1 items-center justify-center gap-2 rounded-[14px] bg-[#1D9E75] text-[15px] font-medium text-white hover:bg-[#178A65] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          className="flex h-13.5 flex-1 items-center justify-center gap-2 rounded-[14px] bg-[#1D9E75] text-[15px] font-medium text-white hover:bg-[#178A65] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {(gpsLoading || routeLoading) && <IconLoader2 size={16} className="animate-spin" />}
           {buttonLabel}
         </button>
       </div>
 
-      <ProgressDots current={1} total={4} />
+      <ProgressDots current={1} total={3} />
 
       {/* Painel GPS com passos da rota */}
       {gpsMode && step && (
@@ -1159,13 +1162,28 @@ export function SensoryMap({
               <button
                 type="button"
                 onClick={handleMainButton}
-                className="w-full h-[50px] rounded-xl bg-[#1D9E75] text-[15px] font-medium text-white hover:bg-[#178A65] transition-colors"
+                className="w-full h-12.5 rounded-xl bg-[#1D9E75] text-[15px] font-medium text-white hover:bg-[#178A65] transition-colors"
               >
                 {currentStep < routeSteps.length - 1 ? "Próximo passo →" : "Cheguei! 🎉"}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal de confirmação de chegada */}
+      {isShowingArrivalConfirmation && (
+        <ArrivalConfirmation
+          event={event}
+          onContinue={() => {
+            setIsShowingArrivalConfirmation(false);
+            onContinue();
+          }}
+          onBack={() => {
+            setIsShowingArrivalConfirmation(false);
+            setCurrentStep(0);
+          }}
+        />
       )}
     </div>
   );
